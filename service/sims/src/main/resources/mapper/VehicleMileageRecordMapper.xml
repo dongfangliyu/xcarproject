@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fintecher.sims.mapper.VehicleMileageRecordMapper">
+
+
+    <select id="queryVehicleMileageRecord" resultType="com.fintecher.sims.vo.VehicleMileageRecordModel">
+        SELECT
+            record.type,
+            record.storage_type       AS storageType,
+            record.order_number       AS orderNumber,
+            record.odometer_number    AS odometerNumber,
+            record.operate_time       AS operateTime,
+            u.user_realname           AS operator,
+            company.company_chinaname AS parkCompany
+        FROM invoicing_vehicle_mileage_record AS record
+            LEFT JOIN company AS company ON record.park_company_id = company.id
+            LEFT JOIN user_information AS u ON record.operator = u.id
+        WHERE record.vehicle_id = #{vehiId}
+    </select>
+</mapper>

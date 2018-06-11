@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fintecher.report.mapper.ReportMapper">
+    <!-- 查询全部机构清结算日报表 -->
+    <select id="getSettlementReportAll" parameterType="com.fintecher.common.vo.report.SettlementReportParam"
+            resultType="com.fintecher.common.vo.report.SettlementReportModel">
+        SELECT
+        companyId,companyName,`type`,
+        sum(CASE WHEN collect_item = 138 THEN collect_money_amount ELSE 0 END) AS initialPayment,
+        sum(CASE WHEN collect_item = 140 THEN collect_money_amount ELSE 0 END) AS depositCash,
+        sum(CASE WHEN collect_item = 147 THEN collect_money_amount ELSE 0 END) AS insuranceExpenses,
+        sum(CASE WHEN collect_item = 148 THEN collect_money_amount ELSE 0 END) AS purchaseTax,
+        sum(CASE WHEN collect_item = 149 THEN collect_money_amount ELSE 0 END) AS otherFee,
+        sum(CASE WHEN collect_item = 151 THEN collect_money_amount ELSE 0 END + CASE WHEN collect_item = 152 THEN
+        collect_money_amount ELSE 0 END) AS param,
+        sum(CASE WHEN collect_item = 154 THEN collect_money_amount ELSE 0 END) AS interestReceived,
+        sum(CASE WHEN collect_item = 155 THEN collect_money_amount ELSE 0 END) AS penaltyReceived,
+        sum(CASE WHEN collect_item = 156 THEN collect_money_amount ELSE 0 END) AS principalReceived
+        FROM(
+        SELECT
+        a.id as companyId,a.company_chinaname AS companyName,d.collect_money_channel AS
+        `type`,d.collect_item,d.collect_money_amount,a.company_status,c.actual_collect_date
+        FROM
+        company AS a
+        LEFT JOIN product_order AS b ON a.id = b.company_id
+        LEFT JOIN collect_money_history AS c ON b.id = c.order_id
+        LEFT JOIN collect_money_detail AS d ON c.id = d.collect_money_id
+        WHERE a.company_status = 0 and d.collect_money_channel in (163,164,165)
+        <if test="channel != null">
+            AND d.collect_money_channel = #{channel}
+        </if>
+        <if test="timeLatitude !=null and timeLatitude == 0">
+            AND DATE_FORMAT(c.actual_collect_date,'%Y-%m-%d') = DATE_SUB(curdate(),INTERVAL 1 DAY)
+        </if>
+        <if test="timeLatitude !=null and timeLatitude == 1">
+            AND DATE_FORMAT(c.actual_collect_date,'%Y-%m-%d') = DATE_FORMAT(now(),'%Y-%m-%d')
+        </if>
+        <if test="timeLatitude !=null and timeLatitude == 2">
+            AND YEARWEEK(now()) = YEARWEEK(DATE_FORMAT(c.actual_collect_date,'%Y-%m-%d'))
+        </if>
+        <if test="timeLatitude !=null and timeLatitude == 3">
+            AND DATE_FORMAT(curdate(),'%Y-%m') = DATE_FORMAT(c.actual_collect_date,'%Y-%m')
+        </if>
+        <if test="timeLatitude !=null and timeLatitude == 4">
+            AND PERIOD_DIFF(date_format(now(),'%Y-%m'), DATE_FORMAT(c.actual_collect_date,'%Y-%m')) = 1
+        </if>
+        <if test="timeLatitude !=null and timeLatitude == 5">
+            AND <![CDATA[DATE_SUB(CURDATE(), INTERVAL 90 DAY) <= date(c.actual_collect_date)]]>
+        </if>
+        <if test="timeLatitude !=null and timeLatitude == 6">
+            AND QUARTER(c.actual_collect_date) = QUARTER(now())
+        </if>
+        <if test="timeLatitude !=null and timeLatitude == 7">
+            AND YEAR(c.actual_collect_date)=YEAR(NOW())
+        </if>
+        <!--<if test="minSettlementDate != null">-->
+        <!--AND <![CDATA[DATE_FORMAT(actual_collect_date,'%Y-%m-%d') >= #{minSettlementDate}]]>-->
+        <!--</if>-->
+        <!--<if test="maxSettlementDate != null">-->
+        <!--AND <![CDATA[DATE_FORMAT(actual_collect_date,'%Y-%m-%d') <= #{maxSettlementDate}]]>-->
+        <!--</if>-->
+        ) AS e
+        GROUP BY
+        `type`,companyName,companyId
+        ORDER BY
+        companyName ASC,`type` ASC
+    </select>
+
+    <!-- 查询单个机构清结算日报表 -->
+    <select id="getSettlementReportOne" parameterType="com.fintecher.common.vo.report.SettlementReportParam"
+            resultType="com.fintecher.common.vo.report.SettlementReportModel">
+        SELECT
+        companyId,companyName,`type`,personalName,`date`,
+        sum(CASE WHEN collect_item = 138 THEN collect_money_amount ELSE 0 END) AS initialPayment,
+        sum(CASE WHEN collect_item = 140 THEN collect_money_amount ELSE 0 END) AS depositCash,
+        sum(CASE WHEN collect_item = 147 THEN collect_money_amount ELSE 0 END) AS insuranceExpenses,
+        sum(CASE WHEN collect_item = 148 THEN collect_money_amount ELSE 0 END) AS purchaseTax,
+        sum(CASE WHEN collect_item = 149 THEN collect_money_amount ELSE 0 END) AS otherFee,
+        sum(CASE WHEN collect_item = 151 THEN collect_money_amount ELSE 0 END + CASE WHEN collect_item = 152 THEN
+        collect_money_amount ELSE 0 END) AS param,
+        sum(CASE WHEN collect_item = 154 THEN collect_money_amount ELSE 0 END) AS interestReceived,
+        sum(CASE WHEN collect_item = 155 THEN collect_money_amount ELSE 0 END) AS penaltyReceived,
+        sum(CASE WHEN collect_item = 156 THEN collect_money_amount ELSE 0 END) AS principalReceived
+        FROM(
+        SELECT
+        a.id as companyId,a.company_chinaname AS companyName,d.collect_money_channel AS
+        `type`,d.collect_item,d.collect_money_amount,a.company_status,c.actual_collect_date,
+        e.`name` as personalName,DATE_FORMAT(c.actual_collect_date,'%Y-%m-%d') as `date`
+        FROM
+        company AS a
+        LEFT JOIN product_order AS b ON a.id = b.company_id
+        LEFT JOIN collect_money_history AS c ON b.id = c.order_id
+        LEFT JOIN collect_money_detail AS d ON c.id = d.collect_money_id
+        LEFT JOIN personal e on b.personal_id = e.id
+        WHERE a.company_status = 0 AND a.id = #{companyId} and d.collect_money_channel in (163,164,165)
+        <if test="channel != null">
+            AND d.collect_money_channel = #{channel}
+        </if>
+        <!--<if test="timeLatitude !=null and timeLatitude == 0">-->
+        <!--AND DATE_FORMAT(c.actual_collect_date,'%Y-%m-%d') = DATE_SUB(curdate(),INTERVAL 1 DAY)-->
+        <!--</if>-->
+        <!--<if test="timeLatitude !=null and timeLatitude == 1">-->
+        <!--AND DATE_FORMAT(c.actual_collect_date,'%Y-%m-%d') = DATE_FORMAT(now(),'%Y-%m-%d')-->
+        <!--</if>-->
+        <!--<if test="timeLatitude !=null and timeLatitude == 2">-->
+        <!--AND YEARWEEK(now()) = YEARWEEK(DATE_FORMAT(c.actual_collect_date,'%Y-%m-%d'))-->
+        <!--</if>-->
+        <!--<if test="timeLatitude !=null and timeLatitude == 3">-->
+        <!--AND DATE_FORMAT(curdate(),'%Y-%m') = DATE_FORMAT(c.actual_collect_date,'%Y-%m')-->
+        <!--</if>-->
+        <!--<if test="timeLatitude !=null and timeLatitude == 4">-->
+        <!--AND PERIOD_DIFF(date_format(now(),'%Y-%m'), DATE_FORMAT(c.actual_collect_date,'%Y-%m')) = 1-->
+        <!--</if>-->
+        <!--<if test="timeLatitude !=null and timeLatitude == 5">-->
+        <!--AND <![CDATA[DATE_SUB(CURDATE(), INTERVAL 90 DAY) <= date(c.actual_collect_date)]]>-->
+        <!--</if>-->
+        <!--<if test="timeLatitude !=null and timeLatitude == 6">-->
+        <!--AND QUARTER(c.actual_collect_date) = QUARTER(now())-->
+        <!--</if>-->
+        <!--<if test="timeLatitude !=null and timeLatitude == 7">-->
+        <!--AND YEAR(c.actual_collect_date)=YEAR(NOW())-->
+        <!--</if>-->
+        <if test="minSettlementDate != null">
+            AND <![CDATA[DATE_FORMAT(c.actual_collect_date,'%Y-%m-%d') >= #{minSettlementDate}]]>
+        </if>
+        <if test="maxSettlementDate != null">
+            AND <![CDATA[DATE_FORMAT(c.actual_collect_date,'%Y-%m-%d') <= #{maxSettlementDate}]]>
+        </if>
+        ) AS e
+        GROUP BY
+        `type`,companyName,personalName,`date`,companyId
+        ORDER BY
+        companyName ASC,`type` ASC
+    </select>
+
+    <!-- 查询还款渠道 -->
+    <select id="getChannel" resultType="com.fintecher.common.vo.report.DataDictModel">
+        SELECT * FROM data_dict WHERE type_code = '0105' ORDER BY id
+    </select>
+
+    <!-- 查询某一个还款渠道 -->
+    <select id="getChannelById" parameterType="integer" resultType="com.fintecher.common.vo.report.DataDictModel">
+        SELECT * FROM data_dict WHERE id = #{id}
+    </select>
+
+    <!-- 获取公司名称 -->
+    <select id="getCompanyName" parameterType="Long" resultType="String">
+        select company_chinaname from company where id = #{id};
+    </select>
+    <!-- 查询月还款报表 -->
+    <select id="getRepaymentReport" parameterType="com.fintecher.common.vo.report.RepaymentParam"
+            resultType="com.fintecher.common.vo.report.RepaymentModel">
+        SELECT b.`name` as personalName,b.id_card as idCardNumber,b.mobile_main as phone,
+        c.deposit_bank as bankName,c.card_number as bankCardNumber,a.periods,a.financingAmount,a.initialPayment,a.depositCash,
+        a.contractNumber,a.purchaseTax,a.insuranceExpenses,a.channel,a.monthRepayment,a.rent,
+        count(case when d.payment_status in (178,181,182,183) then d.id end) as repaidPeriods,
+        sum(case when d.payment_status in (178,181,182,183) then d.sum else 0 end) as totalRepayment,
+        count(case when d.payment_status in (179,180) then d.id end) as surplusPeriods,
+        sum(case when d.payment_status in (179,180) then d.sum else 0 end) as surplusRepayment from
+        (SELECT id,personal_id,contract_num as contractNumber,product_issue_id,intention_financing_amount as financingAmount,periods,
+        initial_payment as initialPayment,deposit_cash as depositCash,purchase_tax as purchaseTax,insurance_expenses as insuranceExpenses,
+        settlement_channel as channel,monthly_supply as monthRepayment,rent_payable as rent from product_order) a
+        LEFT JOIN personal b on a.personal_id = b.id
+        LEFT JOIN personal_bank c on b.id = c.personal_id and b.default_channel = c.settle_channel
+        LEFT JOIN payment_schedule d on d.order_id = a.id GROUP BY b.`name`,b.id_card,b.mobile_main,c.deposit_bank,c.card_number,a.periods,a.financingAmount,
+        a.initialPayment,a.depositCash,a.contractNumber,a.purchaseTax,a.insuranceExpenses,a.channel,a.monthRepayment,a.rent
+        ORDER BY b.`name`
+    </select>
+</mapper>

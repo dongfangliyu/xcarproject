@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fintecher.sims.mapper.VehicleMapper">
+
+
+    <select id="getBaseVehicleInfo" resultType="com.fintecher.sims.vo.VehicleBaseInfo">
+        SELECT
+            CONCAT(IFNULL(b.name, ''), ' ', IFNULL(model.name, '')) AS models,
+            vehicle.frame_number                                    AS frameNumber,
+            vehicle.color                                           AS color,
+            vehicle.production_date                                 AS productionDate,
+            vehicle.plate_number                                    AS plateNumber,
+            vehicle.emission_standard                               AS emissioStandard,
+            vehicle.plate_date                                      AS plateDate,
+            vehicle.certificate_number                              AS certificateNumber,
+            comp.company_chinaname                                  AS parkCompany,
+            vehicle.subjection                                      AS subjection,
+            vehicle.engine_number                                   AS engineNumber,
+            NOW()                                                   AS date1,
+            vehicle.odometer_number                                 AS odometerNumber,
+            m.name                                                  AS manufacturer,
+            vehicle.gps_status                                      AS gpsStatus,
+            vehicle.properties                                      AS properties,
+            vehicle.vehicle_condition                               AS `condition`
+        FROM invoicing_vehicle AS vehicle
+            LEFT JOIN invoicing_vehicle_brand AS b ON b.id = vehicle.vehicle_brand_id
+            LEFT JOIN invoicing_vehicle_model AS model ON model.id = vehicle.vehicle_model_id
+            LEFT JOIN invoicing_manufacturer AS m ON vehicle.manufacturer_id = m.id
+            LEFT JOIN company AS comp ON comp.id = vehicle.park_company_id
+        WHERE vehicle.id = #{id}
+    </select>
+
+    <select id="queryVehicleInfo" resultType="com.fintecher.sims.vo.QueryVehicleInfoModel">
+        SELECT
+        vehi.id,
+        vehi.plate_number AS plateNumber,
+        vehi.frame_number AS frameNumber,
+        vehi.engine_number AS engineNumber,
+        vehi.odometer_number AS odometerNumber,
+        brand.name AS vehicleBrand,
+        series.name AS vehicleSeries,
+        vehi.color AS color,
+        com.company_chinaname AS parkCompany,
+        vehi.vehicle_status AS vehicleStatus,
+        vehi.gps_status AS gpsStatus,
+        vehi.subjection AS subjection,
+        vehi.properties AS properties,
+        vehi.sale_date AS saleDate,
+        NOW() AS date1,
+        NOW() AS date2
+        FROM invoicing_vehicle AS vehi
+        LEFT JOIN invoicing_vehicle_brand AS brand ON vehi.vehicle_brand_id = brand.id
+        LEFT JOIN invoicing_vehicle_series AS series ON series.id = vehi.vehicle_series_id
+        LEFT JOIN company AS com ON com.id = vehi.park_company_id
+        <trim prefix="WHERE" suffixOverrides="AND|OR">
+            <if test="sortStr != null">
+                (vehi.plate_number LIKE CONCAT('%',#{searchStr},'%') OR
+                vehi.frame_number LIKE CONCAT('%',#{searchStr},'%') OR
+                vehi.engine_number LIKE CONCAT('%',#{searchStr},'%')) AND
+            </if>
+        </trim>
+        ORDER BY ${sortStr}
+    </select>
+
+    <select id="queryVehicleStock" resultType="com.fintecher.sims.vo.QueryVehicleStockModel">
+        SELECT
+        vehi.id,
+        vehi.plate_number AS plateNumber,
+        vehi.frame_number AS frameNumber,
+        vehi.engine_number AS engineNumber,
+        vehi.odometer_number AS odometerNumber,
+        brand.name AS vehicleBrand,
+        series.name AS vehicleSeries,
+        mo.name AS vehicleModel
+        vehi.color AS color,
+        com.company_chinaname AS parkCompany,
+        vehi.vehicle_status AS vehicleStatus,
+        vehi.gps_status AS gpsStatus,
+        vehi.subjection AS subjection,
+        vehi.properties AS properties,
+        NOW() AS date1,
+        NOW() AS date2
+        FROM invoicing_vehicle AS vehi
+        LEFT JOIN invoicing_vehicle_brand AS brand ON vehi.vehicle_brand_id = brand.id
+        LEFT JOIN invoicing_vehicle_series AS series ON series.id = vehi.vehicle_series_id
+        LEFT JOIN invoicing_vehicle_model AS mo ON mo.id = vehi.vehicle_model_id
+        LEFT JOIN company AS com ON com.id = vehi.park_company_id
+        <trim prefix="WHERE" suffixOverrides="AND|OR">
+            <if test="sortStr != null">
+                (vehi.plate_number LIKE CONCAT('%',#{searchStr},'%') OR
+                vehi.frame_number LIKE CONCAT('%',#{searchStr},'%') OR
+                vehi.engine_number LIKE CONCAT('%',#{searchStr},'%')) AND
+            </if>
+            <if test="status != null">
+                vehi.vehicle_status = #{status} AND
+            </if>
+        </trim>
+    </select>
+
+</mapper>

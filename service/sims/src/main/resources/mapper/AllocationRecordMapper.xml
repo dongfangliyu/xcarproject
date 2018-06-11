@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fintecher.sims.mapper.AllocationRecordMapper">
+    <resultMap id="AllocationRecord" type="com.fintecher.sims.entity.AllocationRecord">
+        <id property="id" column="id"/>
+        <result property="allocationOrderId" column="allocation_order_id"/>
+        <result property="vehicleId" column="vehicle_id"/>
+        <result property="type" column="type"/>
+        <result property="description" column="description"/>
+        <result property="applyTime" column="apply_time"/>
+        <result property="handleStatus" column="handle_status"/>
+        <result property="handler" column="handler"/>
+        <result property="handleRemark" column="handle_remark"/>
+        <result property="handleTime" column="handle_time"/>
+        <result property="storageTime" column="storage_time"/>
+        <result property="updater" column="updater"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <!-- 多条件查询调拨出库记录 -->
+    <select id="getAllAllocationRecord" parameterType="String" resultType="com.fintecher.sims.vo.AllocationRecordModel">
+        SELECT
+        a.allocationOrderId,
+        b.allocation_order_number AS allocationOrderNumber,
+        a.vehicleId,
+        a.applyTime,
+        a.handleStatus,
+        a.handleTime,
+        c.user_realname AS handler,
+        d.company_chinaname AS inCompanyName,
+        e.company_chinaname AS outCompanyName,
+        g.name AS brand,
+        h.name AS series,
+        i.name AS model,
+        f.color,
+        f.plate_number AS plateNumber,
+        f.frame_number AS frameNumber,
+        f.engine_number AS engineNumber,
+        f.certificate_number AS certificateNumber,
+        f.subjection,
+        j.company_chinaname AS parkPlace,
+        f.plate_date AS plateDate,
+        k.name AS manufacturer,
+        f.vehicle_condition AS `condition`,
+        f.odometer_number AS odometerNumber,
+        f.gps_status AS gpsStatus,
+        a.description
+        FROM (
+        SELECT
+        allocation_order_id AS allocationOrderId,
+        vehicle_id AS vehicleId,
+        apply_time AS applyTime,
+        handle_status AS handleStatus,
+        handle_time AS handleTime,
+        handler AS handler,
+        type,
+        description
+        FROM invoicing_allocation_record where type = #{type}) a
+        LEFT JOIN invoicing_allocation_request b ON a.allocationOrderId = b.id
+        LEFT JOIN user_information c ON a.handler = c.id
+        LEFT JOIN company d ON b.in_company_id = d.id
+        LEFT JOIN company e ON b.out_company_id = e.id
+        LEFT JOIN invoicing_vehicle f ON a.vehicleId = f.id
+        LEFT JOIN invoicing_vehicle_brand g ON f.vehicle_brand_id = g.id
+        LEFT JOIN invoicing_vehicle_series h ON f.vehicle_series_id = h.id
+        LEFT JOIN invoicing_vehicle_model i ON f.vehicle_model_id = i.id
+        LEFT JOIN company j ON f.park_company_id = j.id
+        LEFT JOIN invoicing_manufacturer k ON f.manufacturer_id = k.id
+        where a.handleStatus = 4
+        <if test="keyword != null">
+            AND (g.name LIKE concat('%',#{keyword},'%')
+            OR f.frame_number LIKE concat('%',#{keyword},'%')
+            OR f.engine_number LIKE concat('%',#{keyword},'%')
+            OR f.plate_number LIKE concat('%',#{keyword},'%'))
+        </if>
+        <if test="flag != null">
+            OR a.handleStatus = #{flag}
+        </if>
+    </select>
+</mapper>

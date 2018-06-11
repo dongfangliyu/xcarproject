@@ -1,0 +1,24 @@
+management:
+    context-path: /reminder_api
+spring:
+    application:
+        name: reminder-service
+    profiles:
+      active: @spring.profiles.active@
+    jackson:
+        serialization.write_dates_as_timestamps: true
+    mvc:
+        favicon:
+            enabled: false
+
+server:
+    session:
+        cookie:
+            http-only: true
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 60000

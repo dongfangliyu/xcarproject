@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fintecher.sims.mapper.MeasuresRecordMapper">
+
+    <select id="queryMeasuresRecord" resultType="com.fintecher.sims.vo.MeasuresRecordModel">
+        SELECT
+            record.id,
+            record.operate_time    AS operateTime,
+            record.storage_status  AS storageStatus,
+            record.odometer_number AS odometerNumber,
+            record.description,
+            record.content,
+            u.user_realname        AS operator
+        FROM invoicing_measures_record AS record
+            LEFT JOIN user_information AS u ON record.operator = u.id
+        WHERE vehicle_id = #{vehiId}
+    </select>
+
+    <resultMap id="measuresRecordModel" type="com.fintecher.sims.vo.MeasuresRecordModel">
+        <id property="id" column="id"/>
+        <result property="operateTime" column="operateTime"/>
+        <result property="storageStatus" column="storageStatus"/>
+        <result property="odometerNumber" column="odometerNumber"/>
+        <result property="description" column="description"/>
+        <result property="content" column="content"/>
+        <result property="operator" column="operator"/>
+        <collection property="files" column="id" select="findFilesByMeasuresRecord"/>
+    </resultMap>
+
+    <select id="findFilesByMeasuresRecord" resultType="com.fintecher.sims.vo.FileModel">
+        SELECT
+        file.id,
+        file.file_id AS fileId,
+        file.file_type AS fileType,
+        file.file_name AS fileName,
+        file.file_size AS fileSize,
+        u.user_realname AS operatorRealName,
+        file.operate_time AS operateTime
+        FROM invoicing_measures_record_file AS file
+        LEFT JOIN user_information AS u ON u.id = file.operator
+        WHERE file.id = #{id}
+        ORDER BY file.operate_time DESC
+    </select>
+
+
+</mapper>

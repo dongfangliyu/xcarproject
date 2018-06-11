@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fintecher.contract.mapper.ContractInfoMapper">
+<select id="getContractNum" resultType="com.fintecher.contract.entity.ContractInfo">
+    SELECT
+     c.id,
+     c.crm_order_id AS orderId
+     FROM contract_info c LEFT JOIN product_order p ON c.crm_order_id = p.id WHERE p.id = #{orderId}
+
+</select>
+</mapper>

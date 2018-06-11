@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fintecher.sims.mapper.VehiclePicMapper">
+<select id="findPicByModelId" parameterType="long" resultType="com.fintecher.sims.entity.VehiclePic">
+  SELECT
+  m.id,
+  p.file_name AS fileName,
+  p.file_size AS fileSize
+  FROM invoicing_vehicle_pic p
+  LEFT JOIN  invoicing_vehicle_model m  ON  m.id = p.vehicle_model_id
+  WHERE m.id = #{id}
+</select>
+</mapper>

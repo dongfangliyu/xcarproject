@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fintecher.sims.mapper.ManufacturerMapper">
+    <select id="findManufacturerByName" parameterType="string" resultType="com.fintecher.sims.entity.Manufacturer">
+    SELECT * FROM invoicing_manufacturer WHERE   is_delete = 1
+        <if test="name != null">
+            AND name LIKE concat('%',trim(#{name}),'%')
+        </if>
+    </select>
+</mapper>

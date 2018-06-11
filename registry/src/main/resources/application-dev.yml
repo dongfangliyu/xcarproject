@@ -1,0 +1,20 @@
+server:
+    port: 8761 #启动端口
+
+eureka:
+  instance:
+    statusPageUrlPath: /info
+    healthCheckUrlPath: /health
+#    metadata-map:
+#      user.name: ${security.user.name}
+#      user.password: ${security.user.password}
+  client:
+    registerWithEureka: true #表示是否注册自身到eureka服务器
+    fetchRegistry: false #表示是否从eureka服务器获取注册信息,如果为true，启动时报警
+    service-url:
+      defaultZone: http://${security.user.name}:${security.user.password}@${EUREKA_HOST:localhost}:${EUREKA_PORT:8761}/eureka/
+
+security:
+  user:
+    name: user
+    password: ${REGISTRY_SERVER_PASSWORD:password}

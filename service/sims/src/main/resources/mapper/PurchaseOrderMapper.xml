@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fintecher.sims.mapper.PurchaseOrderMapper">
+    <resultMap id="PurchaseOrder" type="com.fintecher.sims.entity.PurchaseOrder">
+        <id property="id" column="id"/>
+        <result property="purchaseNumber" column="purchase_number"/>
+        <result property="purchaseType" column="purchase_type"/>
+        <result property="deliveryPlace" column="delivery_place"/>
+        <result property="supplierId" column="supplier_id"/>
+        <result property="billingWay" column="billing_way"/>
+        <result property="payWay" column="pay_way"/>
+        <result property="totalAmount" column="total_amount"/>
+        <result property="totalGuidancePrice" column="total_guidance_price"/>
+        <result property="totalPurchasePrice" column="total_purchase_price"/>
+        <result property="hasPayAmount" column="has_pay_amount"/>
+        <result property="surplusAmount" column="surplus_amount"/>
+        <result property="printNumber" column="print_number"/>
+        <result property="remark" column="remark"/>
+        <result property="applicant" column="applicant"/>
+        <result property="applyTime" column="apply_time"/>
+        <result property="applyStatus" column="apply_status"/>
+        <result property="updater" column="updater"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+</mapper>

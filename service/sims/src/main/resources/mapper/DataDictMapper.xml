@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fintecher.manage.mapper.DataDictMapper">
+    <resultMap id="DataDictResultMap" type="com.fintecher.sims.entity.DataDict">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="type_code" property="typeCode" jdbcType="VARCHAR"/>
+        <result column="code" property="code" jdbcType="VARCHAR"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="sort" property="sort" jdbcType="INTEGER"/>
+    </resultMap>
+    <!--通过TypeCode获取数据字典列表-->
+    <select id="findDataDictByTypeCode" parameterType="string" resultMap="DataDictResultMap">
+        SELECT
+        *
+        FROM
+        data_dict t
+        LEFT JOIN data_dict_type t1 ON t.type_code = t1.code
+        WHERE
+        t1.code = #{code}
+        <if test="name != null">
+            AND t.name LIKE concat('%',#{name},'%')
+        </if>
+        ORDER BY sort ASC
+    </select>
+
+    <!--通过TypeCode获取数据字典列表-->
+    <select id="getAllDataDict" parameterType="string" resultMap="DataDictResultMap">
+        SELECT
+        *
+        FROM
+        data_dict t
+        LEFT JOIN data_dict_type t1 ON t.type_code = t1.code
+        WHERE
+        t1.code = #{code}
+        <if test="name != null">
+            and t.`name` LIKE concat('%',trim(#{name}),'%')
+        </if>
+    </select>
+
+    <!-- 获取数据字典项最大ID -->
+    <select id="getMaxId" resultType="Integer">
+        SELECT max(id) FROM data_dict
+    </select>
+
+    <!-- 获取最大排序 -->
+    <select id="getMaxSort" parameterType="String" resultType="Integer">
+        SELECT max(sort) from data_dict where type_code = #{typeCode}
+    </select>
+</mapper>

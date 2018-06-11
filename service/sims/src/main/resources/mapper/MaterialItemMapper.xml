@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fintecher.sims.mapper.MaterialItemMapper">
+    <resultMap id="MaterialItem" type="com.fintecher.sims.entity.MaterialItem">
+        <id property="id" column="id"/>
+        <result property="materialCategoryId" column="material_category_id"/>
+        <result property="name" column="name"/>
+        <result property="isNecessary" column="is_necessary"/>
+        <result property="operator" column="operator"/>
+        <result property="operateTime" column="operateTime"/>
+        <result property="updater" column="updater"/>
+        <result property="updateTime" column="updateTime"/>
+    </resultMap>
+
+    <!-- 根据车辆素材类别ID查询车辆素材 -->
+    <select id="getAllItem" parameterType="Long" resultMap="MaterialItem">
+        select * from invoicing_material_item where material_category_id = #{id};
+    </select>
+</mapper>

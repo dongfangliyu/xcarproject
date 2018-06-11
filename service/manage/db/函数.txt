@@ -1,0 +1,17 @@
+BEGIN
+	declare current integer;
+    set current = 0;
+    select t.current_seq into current from batch_seq t where t.seq_name =seq_name for update;
+    update batch_seq t set t.current_seq = t.current_seq + 1 where t.seq_name = seq_name;
+    set current = current + 1;
+				/*如果订单号超出限制,产生一个错误*/  
+        IF seq_name ='orderSeq' && current >9999 THEN   
+            SIGNAL SQLSTATE 'HY000' SET MESSAGE_TEXT = "今日订单编号已到上限";
+        END IF; 
+	RETURN LPAD(current,seqLength,'0');
+END
+
+
+参数  `seq_name` varchar(20),`seqLength` int
+返回类型  varchar(20)
+类型 FUNCTION

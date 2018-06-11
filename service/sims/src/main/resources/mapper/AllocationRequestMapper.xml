@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fintecher.sims.mapper.AllocationRequestMapper">
+    <resultMap id="AllocationRequest" type="com.fintecher.sims.entity.AllocationRequest">
+        <id property="id" column="id"/>
+        <result property="allocationOrderNumber" column="allocation_order_number"/>
+        <result property="outCompanyId" column="out_company_id"/>
+        <result property="inCompanyId" column="in_company_id"/>
+        <result property="logisticsType" column="logistics_type"/>
+        <result property="applicant" column="applicant"/>
+        <result property="applyTime" column="apply_time"/>
+        <result property="applyDepartmentId" column="apply_department_id"/>
+        <result property="applyStatus" column="apply_status"/>
+        <result property="inHandleStatus" column="in_handle_status"/>
+        <result property="inHandleRemark" column="in_handle_remark"/>
+        <result property="inHandler" column="in_handler"/>
+        <result property="inHandleTime" column="in_handle_time"/>
+        <result property="headHandleStatus" column="head_handle_status"/>
+        <result property="headHandleRemark" column="head_handle_remark"/>
+        <result property="headHandler" column="head_handler"/>
+        <result property="headHandleTime" column="head_handle_time"/>
+        <result property="outHandleStatus0" column="out_handle_status"/>
+        <result property="outHandleRemark" column="out_handle_remark"/>
+        <result property="outHandler" column="out_handler"/>
+        <result property="outHandleTime" column="out_handle_time"/>
+        <result property="updater" column="updater"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <!-- 多条件查询调拨申请 -->
+    <select id="getAllAllocationRequest" parameterType="String"
+            resultType="com.fintecher.sims.vo.AllocationRequestModel">
+        select a.id,a.allocationOrderNumber,a.applyTime,a.applyStatus,b.company_chinaname as inCompanyName,
+        c.company_chinaname as outCompanyName,d.user_realname as applicantName,e.dept_name as
+        applyDepartment,a.logisticsType
+        from (select in_company_id,out_company_id,id,allocation_order_number as allocationOrderNumber,apply_time as
+        applyTime,apply_status as applyStatus,applicant,apply_department_id,logistics_type as logisticsType
+        FROM invoicing_allocation_request) a
+        LEFT JOIN company b on a.in_company_id = b.id
+        LEFT JOIN company c on a.out_company_id = c.id
+        LEFT JOIN user_information d on a.applicant = d.id
+        LEFT JOIN department e on a.apply_department_id = e.id
+        where 1 = 1
+        <if test="allocationOrderNumber != null">
+            AND a.allocationOrderNumber = #{allocationOrderNumber}
+        </if>
+        ORDER BY a.applyTime DESC
+    </select>
+
+    <!-- 根据调拨申请查询车辆信息 -->
+    <select id="getVehicleByAllocationId" parameterType="Long" resultType="com.fintecher.sims.vo.VehicleDetailsModel">
+        SELECT
+            a.vehicleId,
+            d.name               AS brand,
+            c.name               AS series,
+            e.name               AS model,
+            b.color,
+            b.frame_number       AS frameNumber,
+            b.certificate_number AS certificateNumber,
+            b.engine_number      AS engineNumber,
+            b.production_date    AS productionDate
+        FROM (
+                 SELECT vehicle_id AS vehicleId
+                 FROM invoicing_allocation_vehicle
+                 WHERE allocation_request_id = #{id}) a
+            LEFT JOIN invoicing_vehicle b ON a.vehicleId = b.id
+            LEFT JOIN invoicing_vehicle_series c ON b.vehicle_series_id = c.id
+            LEFT JOIN invoicing_vehicle_brand d ON b.vehicle_brand_id = d.id
+            LEFT JOIN invoicing_vehicle_model e ON b.vehicle_model_id = e.id
+    </select>
+</mapper>

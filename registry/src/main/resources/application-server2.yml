@@ -1,0 +1,17 @@
+server:
+    port: 8751 #启动端口
+
+eureka:
+  instance:
+    hostname: registry2
+    instance-id: ${spring.application.name}:${server.port}
+  client:
+    registerWithEureka: true #表示是否注册自身到eureka服务器
+    fetchRegistry: false #表示是否从eureka服务器获取注册信息,如果为true，启动时报警
+    service-url:
+      defaultZone: http://${security.user.name}:${security.user.password}@registry1:8761/eureka,http://${security.user.name}:${security.user.password}@registry3:8741/eureka
+
+security:
+  user:
+    name: user
+    password: ${REGISTRY_SERVER_PASSWORD:password}

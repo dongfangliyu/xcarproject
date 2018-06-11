@@ -1,0 +1,42 @@
+spring:
+    profiles:
+        active: local
+        include: swagger
+    devtools:
+        restart:
+            enabled: true
+        livereload:
+            enabled: false # we use gulp + BrowserSync for livereload
+    jackson:
+        serialization.indent_output: true
+    data:
+        mongodb:
+            uri: mongodb://192.168.3.8:27017
+            database: file_db_test
+    rabbitmq:
+        username: dev
+        password: dev
+        host: 192.168.3.10
+        virtual-host: dev
+        port: 5672
+    jmx:
+        enabled: false
+
+eureka:
+  instance:
+    statusPageUrlPath: /info
+    healthCheckUrlPath: /health
+    metadata-map:
+      user.name: ${security.user.name}
+      user.password: ${security.user.password}
+  client:
+    service-url:
+      defaultZone: http://${security.user.name}:${security.user.password}@${EUREKA_HOST:localhost}:${EUREKA_PORT:8761}/eureka/
+security:
+  user:
+    name: user
+    password: ${REGISTRY_SERVER_PASSWORD:password}
+
+gridfs:
+  path: 192.168.3.10:9000/file-service
+  localPath: 127.0.0.7:9000/file-service

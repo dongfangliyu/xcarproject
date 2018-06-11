@@ -1,0 +1,14 @@
+spring:
+    application:
+        name: registry
+    profiles:
+        active: dev
+    #动态配置
+#    cloud:
+#        config:
+#          uri: http://localhost:8060
+#          discovery:
+#            enabled: true
+info:
+  name: 注册中心
+  desc: 所有服务都注册到这里，被发现调用

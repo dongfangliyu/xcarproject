@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fintecher.sims.mapper.AllocationScheduleMapper">
+    <resultMap id="AllocationSchedule" type="com.fintecher.sims.entity.AllocationSchedule">
+        <id property="id" column="id"/>
+        <result property="allocationRequestId" column="allocation_request_id"/>
+        <result property="item" column="item"/>
+        <result property="remark" column="remark"/>
+        <result property="operator" column="operator"/>
+        <result property="operateTime" column="operate_time"/>
+    </resultMap>
+
+    <!-- 查询调拨进度 -->
+    <select id="getAllAllocationSchedule" parameterType="Long"
+            resultType="com.fintecher.sims.vo.AllocationScheduleModel">
+        SELECT
+            a.time,
+            a.item,
+            b.user_realname AS operatorName
+        FROM (
+                 SELECT
+                     operate_time AS time,
+                     item,
+                     operator
+                 FROM invoicing_allocation_schedule
+                 WHERE allocation_request_id = #{id}) a
+            LEFT JOIN user_information b ON a.operator = b.id
+        ORDER BY operate_time DESC
+    </select>
+</mapper>

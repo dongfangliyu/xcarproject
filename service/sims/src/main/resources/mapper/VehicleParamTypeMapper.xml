@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fintecher.sims.mapper.VehicleParamTypeMapper">
+<select id="findByParamList" parameterType="long" resultType="com.fintecher.sims.vo.VehicleParamModel">
+    SELECT
+    m.id as modelId,
+    t.name AS paramTypeName,
+    p.value AS paramValue,
+    p.name AS paramName
+    FROM invoicing_vehicle_model m
+    LEFT JOIN  invoicing_vehiclel_param_type t on t.vehicle_model_id = m.id
+    LEFT JOIN  invoicing_vehiclel_param  p ON p.param_type_id = t.id
+    where
+        m.id = #{modelId}
+</select>
+</mapper>

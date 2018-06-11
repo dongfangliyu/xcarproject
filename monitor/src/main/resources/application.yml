@@ -1,0 +1,54 @@
+spring:
+    application:
+        name: monitor
+    boot:
+        admin:
+          routes:
+            endpoints: env,metrics,dump,jolokia,info,configprops,trace,logfile,refresh,flyway,liquibase,heapdump,loggers,auditevents,hystrix.stream
+          turbine:
+            clusters: default
+            location: MONITOR
+            clusterNameExpression: new String("default")
+            app-config: MANAGE-SERVICE
+          client:
+            prefer-ip: true
+    mvc:
+      async:
+        request-timeout: -1
+    #动态配置
+#   cloud:
+#        config:
+#          uri: http://localhost:8060
+#          discovery:
+#            enabled: true
+server:
+    port: 8763 #启动端口
+
+#security:
+#    user:
+#        name: whb
+#        password: 123456
+#        role: USER
+
+eureka:
+  instance:
+    statusPageUrlPath: /info
+    healthCheckUrlPath: /health
+    metadata-map:
+      user.name: ${security.user.name}
+      user.password: ${security.user.password}
+  client:
+    service-url:
+      defaultZone: http://${security.user.name}:${security.user.password}@${EUREKA_HOST:localhost}:${EUREKA_PORT:8761}/eureka/
+security:
+  user:
+    name: user
+    password: ${REGISTRY_SERVER_PASSWORD:password}
+
+management:
+  security:
+    enabled: false
+
+info:
+  name: 监控服务
+  desc: 监控所有注册到EURKA的服务，可以看到每个服务的健康状况和接口请求状态

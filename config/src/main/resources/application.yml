@@ -1,0 +1,15 @@
+spring:
+    application:
+        name: config
+    cloud:
+        config:
+            server:
+                git:
+                    uri: https://gitee.com/dmoon/config.git
+                    search-paths: chedai-config-files
+
+server:
+    port: 8760 #启动端口
+info:
+  name: 动态配置服务
+  desc: 负责配置所有服务的配置文件，支持本地，远程git等

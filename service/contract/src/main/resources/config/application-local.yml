@@ -1,0 +1,46 @@
+spring:
+    profiles:
+        active: local
+    datasource:
+      url: jdbc:mysql://localhost:3306/carfl_dev?useUnicode=true&characterEncoding=utf-8&autoReconnect=true&allowMultiQueries=true&useSSL=false
+      username: root
+      password: 123456
+    rabbitmq:
+      username: guest
+      password: guest
+      host: 127.0.0.1
+      virtual-host: dev
+      port: 5672
+    jmx:
+      enabled: false
+    #redis-cache 相关
+    redis:
+      database: 8
+      host: 127.0.0.1
+      port: 6379
+      sysName: contract
+      pool:
+        #连接池支持的最大连接数
+        max-active: 1000
+        #连接池中连接用完时,新的请求等待时间,毫秒
+        max-wait: 60000
+        #连接池中最多可空闲maxIdle个连接
+        max-idle: 400
+mybatis:
+    basepackage: com.fintecher.contract.mapper
+    xmlLocation: classpath:mapper/**/*.xml
+
+eureka:
+  instance:
+    statusPageUrlPath: /info
+    healthCheckUrlPath: /health
+    metadata-map:
+      user.name: ${security.user.name}
+      user.password: ${security.user.password}
+  client:
+    service-url:
+      defaultZone: http://${security.user.name}:${security.user.password}@${EUREKA_HOST:localhost}:${EUREKA_PORT:8761}/eureka/
+security:
+  user:
+    name: user
+    password: ${REGISTRY_SERVER_PASSWORD:password}

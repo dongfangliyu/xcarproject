@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fintecher.sims.mapper.MarketQuotationMapper">
+
+    <select id="queryMarketQuotation" resultType="com.fintecher.sims.vo.QueryMarketQuotationModel">
+        SELECT
+        supp.name AS supplier,
+        brand.name AS vehicleBrand,
+        series.name AS vehicleSeries,
+        model.name AS vehicleModel,
+        market.guidance_price AS guidancePrice,
+        market.purchase_price AS purchasePrice,
+        market.operate_time AS operateTime
+        FROM invoicing_market_quotation AS market
+        LEFT JOIN invoicing_supplier AS supp ON supp.id = market.supplier_id
+        LEFT JOIN invoicing_vehicle_brand AS brand ON brand.id = market.vehicle_brand_id
+        LEFT JOIN invoicing_vehicle_series AS series ON series.id = market.vehicle_series_id
+        LEFT JOIN invoicing_vehicle_model AS model ON model.id = market.vehicle_model_id
+        <trim prefix="WHERE" suffixOverrides="AND|OR">
+            <if test="supplierId != null">
+                supp.id = #{supplierId} AND
+            </if>
+            <if test="searchStr != null">
+                (brand.name LIKE CONCAT('%',#{searchStr},'%') OR
+                series.name LIKE CONCAT('%',#{searchStr},'%') OR
+                model.name LIKE CONCAT('%',#{searchStr},'%')) AND
+            </if>
+            <if test="minCreateTime != null">
+                market.operate_time &gt;= #{minCreateTime} AND
+            </if>
+            <if test="maxCreateTime != null">
+                market.operate_time &lt;= #{maxCreateTime} AND
+            </if>
+        </trim>
+    </select>
+</mapper>

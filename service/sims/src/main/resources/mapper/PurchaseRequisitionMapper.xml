@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fintecher.sims.mapper.PurchaseRequisitionMapper">
+
+
+    <select id="queryPurchaseRequisition" resultType="com.fintecher.sims.vo.QueryPurchaseRequisitionModel">
+        SELECT
+            com.company_chinaname AS companyName,
+            brand.name            AS vehicleBrand,
+            series.name           AS vehicleSeries,
+            model.name            AS vehicleModel,
+            req.color,
+            req.number,
+            u.user_realname       AS approveRealName,
+            req.approve_time      AS approveTime
+        FROM invoicing_purchase_requisition AS req
+            LEFT JOIN company AS com ON com.id = req.company_id
+            LEFT JOIN invoicing_vehicle_brand AS brand ON brand.id = req.vehicle_brand_id
+            LEFT JOIN invoicing_vehicle_series AS series ON series.id = req.vehicle_series_id
+            LEFT JOIN invoicing_vehicle_model AS model ON model.id = req.vehicle_model_id
+            LEFT JOIN user_information AS u ON u.id = req.approver
+    </select>
+</mapper>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fintecher.sims.mapper.MaterialCategoryMapper">
+    <resultMap id="MaterialCategory" type="com.fintecher.sims.entity.MaterialCategory">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="operator" column="operator"/>
+        <result property="operateTime" column="operate_time"/>
+        <result property="updater" column="updater"/>
+        <result property="updateTime" column="updateTime"/>
+    </resultMap>
+
+    <!-- 检查类别名称唯一性 -->
+    <select id="checkUniqueness" parameterType="String" resultMap="MaterialCategory">
+        select * from invoicing_material_category where name = #{name};
+    </select>
+</mapper>
